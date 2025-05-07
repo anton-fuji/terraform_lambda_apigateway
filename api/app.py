@@ -1,9 +1,14 @@
-import json
+from flask import  Flask, jsonify
 
-def handler(event, context):
-    print(event)
-    
-    return {
-        "statusCode": 200,
-        "body": json.dumps({ "message": "Hello, Lambda!" })
-    }
+app = Flask(__name__)
+
+@app.route('/', methods=['GET'])
+def home():
+    return jsonify({'message': "Hello, lambda!"})
+
+@app.route('/testing', methods=['GET'])
+def testing():
+    return jsonify({'message': "testing, lambda!!"})
+
+if __name__ == '__main__':
+    app.run(debug=True)
