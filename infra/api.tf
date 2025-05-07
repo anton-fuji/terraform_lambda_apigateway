@@ -76,17 +76,15 @@ resource "aws_cloudwatch_log_group" "api_gw" {
   retention_in_days = 30
 }
 
-# Lambda Integration
 resource "aws_apigatewayv2_integration" "lambda" {
   api_id = aws_apigatewayv2_api.lambda.id
   integration_uri    = module.lambda_function.lambda_function_arn
   integration_type   = "AWS_PROXY"
-  payload_format_version = "2.0"
+  integration_method = "POST"
 }
 
 resource "aws_apigatewayv2_route" "lambda" {
   api_id = aws_apigatewayv2_api.lambda.id
-
   route_key = "ANY /{proxy+}"
   target    = "integrations/${aws_apigatewayv2_integration.lambda.id}"
 }
@@ -97,7 +95,7 @@ resource "aws_lambda_permission" "api_gw" {
   function_name = module.lambda_function.lambda_function_name
   principal     = "apigateway.amazonaws.com"
 
-  source_arn = "${aws_apigatewayv2_api.lambda.execution_arn}/*"
+  source_arn = "${aws_apigatewayv2_api.lambda.execution_arn}/*/*"
 }
 
 output "api_gateway_url" {
