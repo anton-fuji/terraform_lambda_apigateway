@@ -3,11 +3,11 @@ from mangum import Mangum
 
 app = FastAPI()
 
-@app.get("/")
-async def root():
+@app.get("/api")
+async def home():
     return {"message": "Hello, Lambda!"}
 
-@app.get("/testing")
+@app.get("/api/testing")
 async def testing():
     return {"message": "Testing, Lambda!"}
 
