@@ -18,6 +18,8 @@ module "lambda_function" {
 
   image_uri    = module.docker_image.image_uri
   package_type = "Image"
+  memory_size = 256
+  timeout = 15
 
   depends_on = [module.docker_image]
 }
@@ -71,17 +73,15 @@ resource "aws_apigatewayv2_stage" "lambda" {
 
 resource "aws_cloudwatch_log_group" "api_gw" {
   name = "/aws/api_gw/${aws_apigatewayv2_api.lambda.name}"
-
   retention_in_days = 30
 }
 
 # Lambda Integration
 resource "aws_apigatewayv2_integration" "lambda" {
   api_id = aws_apigatewayv2_api.lambda.id
-
   integration_uri    = module.lambda_function.lambda_function_arn
   integration_type   = "AWS_PROXY"
-  integration_method = "POST"
+  payload_format_version = "2.0"
 }
 
 resource "aws_apigatewayv2_route" "lambda" {
@@ -97,7 +97,7 @@ resource "aws_lambda_permission" "api_gw" {
   function_name = module.lambda_function.lambda_function_name
   principal     = "apigateway.amazonaws.com"
 
-  source_arn = "${aws_apigatewayv2_api.lambda.execution_arn}/*/*"
+  source_arn = "${aws_apigatewayv2_api.lambda.execution_arn}/*"
 }
 
 output "api_gateway_url" {
