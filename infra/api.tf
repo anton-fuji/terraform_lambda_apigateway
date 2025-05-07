@@ -47,8 +47,7 @@ resource "aws_apigatewayv2_api" "lambda" {
 
 resource "aws_apigatewayv2_stage" "lambda" {
   api_id = aws_apigatewayv2_api.lambda.id
-
-  name        = "prod"
+  name        = "$default"
   auto_deploy = true
 
   access_log_settings {
@@ -80,11 +79,17 @@ resource "aws_apigatewayv2_integration" "lambda" {
   api_id = aws_apigatewayv2_api.lambda.id
   integration_uri    = module.lambda_function.lambda_function_arn
   integration_type   = "AWS_PROXY"
-  integration_method = "POST"
+  payload_format_version = "2.0"
 }
 
-resource "aws_apigatewayv2_route" "lambda" {
-  api_id = aws_apigatewayv2_api.lambda.id
+resource "aws_apigatewayv2_route" "lambda_root" {
+  api_id    = aws_apigatewayv2_api.lambda.id
+  route_key = "ANY /"
+  target    = "integrations/${aws_apigatewayv2_integration.lambda.id}"
+}
+
+resource "aws_apigatewayv2_route" "lambda_proxy" {
+  api_id    = aws_apigatewayv2_api.lambda.id
   route_key = "ANY /{proxy+}"
   target    = "integrations/${aws_apigatewayv2_integration.lambda.id}"
 }
