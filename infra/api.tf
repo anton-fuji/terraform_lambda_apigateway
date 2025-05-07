@@ -13,7 +13,7 @@ provider "docker" {
 module "lambda_function" {
   source = "terraform-aws-modules/lambda/aws"
 
-  function_name  = "flask-api"
+  function_name  = "lambda-api"
   create_package = false
 
   image_uri    = module.docker_image.image_uri
@@ -26,7 +26,7 @@ module "docker_image" {
   source = "terraform-aws-modules/lambda/aws//modules/docker-build"
 
   create_ecr_repo = true
-  ecr_repo        = "flask-api"
+  ecr_repo        = "lambda-api"
 
   use_image_tag = true
   image_tag     = "1.0"
@@ -39,7 +39,7 @@ module "docker_image" {
 }
 
 resource "aws_apigatewayv2_api" "lambda" {
-  name          = "flask-api-gateway"
+  name          = "lambda-api-gateway"
   protocol_type = "HTTP"
 }
 
